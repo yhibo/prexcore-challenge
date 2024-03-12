@@ -1,12 +1,15 @@
-// use chrono::NaiveDate;
-use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use rust_decimal::Decimal;
+use chrono::NaiveDate;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Client {
     pub id: u32,
+    pub client_name: String,
+    pub birth_date: NaiveDate,
     pub document_number: String,
+    pub country: String,
     pub balance: Decimal,
 }
 

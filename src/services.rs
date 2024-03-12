@@ -1,30 +1,33 @@
-use crate::errors::ServiceError;
 use crate::models::{Client, ClientDB};
-use chrono::Utc;
+use crate::errors::ServiceError;
 use rust_decimal::Decimal;
 use std::fs::OpenOptions;
 use std::io::Write;
+use chrono::{Utc, NaiveDate};
 
-pub fn create_client(db: &mut ClientDB, document_number: String) -> Result<u32, ServiceError> {
-    if db
-        .clients
-        .values()
-        .any(|c| c.document_number == document_number)
-    {
+pub fn create_client(
+    db: &mut ClientDB,
+    client_name: String,
+    birth_date: NaiveDate,
+    document_number: String,
+    country: String,
+) -> Result<u32, ServiceError> {
+    if db.clients.values().any(|c| c.document_number == document_number) {
         return Err(ServiceError::ClientAlreadyExists);
     }
 
     let id = db.next_id;
     db.next_id += 1;
-
-    // db.dni_id_map.insert(document_number.clone(), id);
     
     let client = Client {
         id,
+        client_name,
+        birth_date,
         document_number,
+        country,
         balance: Decimal::new(0, 0),
     };
-    
+
     db.clients.insert(id, client);
 
     Ok(id)
