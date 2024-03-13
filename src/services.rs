@@ -54,7 +54,7 @@ pub fn transaction(
         return Err(ServiceError::InvalidTransactionAmount);
     }
 
-    // Retrieve the client by ID and apply the transaction.
+    // Retrieve the client by ID
     let client = db
         .clients
         .get_mut(&client_id)

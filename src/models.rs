@@ -21,8 +21,8 @@ pub struct Client {
 }
 
 // Define a struct to represent the client database.
-// It includes a mapping from client ID to client data, a reverse mapping from document
-// number to client ID to search for duplicates faster, and counters for generating new IDs
+// It includes a mapping from client ID to client data, a reverse mapping from document number
+// to client ID to search for duplicates faster, and counters for generating new IDs
 // and for balance storage.
 pub struct ClientDB {
     pub clients: BTreeMap<u32, Client>,

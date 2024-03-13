@@ -71,7 +71,7 @@ pub struct DebitTransactionRequest {
     pub debit_amount: Decimal,
 }
 
-// Handler for processing a new credit transaction.
+// Handler for processing a new debit transaction.
 #[post("/new_debit_transaction")]
 pub async fn new_debit_transaction(
     db: web::Data<Mutex<ClientDB>>,
