@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "4f331836-e240-4e1c-adf3-65bca2d2e226",
-		"name": "Rust API Testing",
+		"name": "PrexCore Challenge API Testing",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "33499782"
 	},
