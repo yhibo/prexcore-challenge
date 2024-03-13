@@ -1,9 +1,9 @@
-use crate::models::ClientDB;
+use crate::models::{ClientDB, TransactionType};
 use crate::services;
 use actix_web::{get, post, web, HttpResponse};
-use serde::Deserialize;
 use chrono::NaiveDate;
 use rust_decimal::Decimal;
+use serde::Deserialize;
 use tokio::sync::Mutex;
 
 #[derive(Deserialize)]
@@ -45,9 +45,9 @@ pub async fn new_credit_transaction(
     body: web::Json<CreditTransactionRequest>,
 ) -> HttpResponse {
     let mut db = db.lock().await;
-    
-    match services::credit_transaction(&mut db, body.client_id, body.credit_amount) {
-        Ok(balance) => HttpResponse::Ok().json(serde_json::json!({"balance": balance})),  
+
+    match services::transaction(&mut db, body.client_id, body.credit_amount, TransactionType::Credit) {
+        Ok(balance) => HttpResponse::Ok().json(serde_json::json!({"balance": balance})),
         Err(e) => HttpResponse::BadRequest().body(e.to_string()),
     }
 }
@@ -65,9 +65,9 @@ pub async fn new_debit_transaction(
 ) -> HttpResponse {
     let mut db = db.lock().await;
 
-    match services::debit_transaction(&mut db, body.client_id, body.debit_amount) {
+    match services::transaction(&mut db, body.client_id, body.debit_amount, TransactionType::Debit) {
         Ok(balance) => HttpResponse::Ok().json(serde_json::json!({"balance": balance})),
-        Err(e) => HttpResponse::BadRequest().body(e.to_string()),  
+        Err(e) => HttpResponse::BadRequest().body(e.to_string()),
     }
 }
 
@@ -96,7 +96,7 @@ pub async fn client_balance(
     let db = db.lock().await;
 
     match services::get_client_balance(&db, client_id_value) {
-        Some(client) => HttpResponse::Ok().json(client),
-        None => HttpResponse::NotFound().body("Client not found"),
+        Ok(client) => HttpResponse::Ok().json(client),
+        Err(e) => HttpResponse::BadRequest().body(e.to_string()),
     }
 }

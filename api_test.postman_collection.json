@@ -1,0 +1,585 @@
+{
+	"info": {
+		"_postman_id": "4f331836-e240-4e1c-adf3-65bca2d2e226",
+		"name": "Rust API Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33499782"
+	},
+	"item": [
+		{
+			"name": "Create a new client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var initial_number = pm.collectionVariables.get(\"document_number\")",
+							"var current_number = pm.variables.get(\"document_number\")",
+							"",
+							"if (current_number - 100 < initial_number){",
+							"    postman.setNextRequest(\"Create a new client\");",
+							"} else {",
+							"    postman.setNextRequest(\"Add existent client\");",
+							"}",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains client_id\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.client_id).to.be.a('number');",
+							"});",
+							"",
+							"pm.collectionVariables.set(\"client_id\", pm.response.json().client_id);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var current_number = pm.variables.get(\"document_number\");",
+							"current_number++;",
+							"pm.variables.set(\"document_number\", current_number);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"client_name\": \"Juan Casas\",\n  \"birth_date\": \"1990-01-01\",\n  \"document_number\": \"{{document_number}}\",\n  \"country\": \"Argentina\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/new_client",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"new_client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add existent client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response contains error message\", function () {",
+							"    var responseBody = pm.response.text();",
+							"    pm.expect(responseBody).to.include(\"Client already exists\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"client_name\": \"Juan Casas\",\n  \"birth_date\": \"1990-01-01\",\n  \"document_number\": \"{{document_number}}\",\n  \"country\": \"Argentina\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/new_client",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"new_client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Perform a credit transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains updated balance\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.balance).to.equal(\"1000.00\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"client_id\": {{client_id}},\n  \"credit_amount\": \"1000.00\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/new_credit_transaction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"new_credit_transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Perform a debit transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains updated balance\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.balance).to.equal(\"499.75\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"client_id\": {{client_id}},\n  \"debit_amount\": \"500.25\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/new_debit_transaction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"new_debit_transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response contains error message\", function () {",
+							"    var responseBody = pm.response.text();",
+							"    pm.expect(responseBody).to.include(\"Invalid transaction amount, it must be positive and with 2 decimal places\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"client_id\": {{client_id}},\n  \"credit_amount\": \"1000.0\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/new_credit_transaction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"new_credit_transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invalid transaction 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response contains error message\", function () {",
+							"    var responseBody = pm.response.text();",
+							"    pm.expect(responseBody).to.include(\"Invalid transaction amount, it must be positive and with 2 decimal places\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"client_id\": {{client_id}},\n  \"credit_amount\": \"-1000.00\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/new_credit_transaction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"new_credit_transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get client balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains client details\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.client_name).to.be.a('string');",
+							"    pm.expect(jsonData.birth_date).to.be.a('string');",
+							"    pm.expect(jsonData.document_number).to.be.a('string');",
+							"    pm.expect(jsonData.country).to.be.a('string');",
+							"    pm.expect(jsonData.balance).to.equal(\"499.75\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/client_balance?client_id={{client_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"client_balance"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Store balances",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/store_balances",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"store_balances"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get client balance after storing balances",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains client details with zero balance\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.client_name).to.be.a('string');",
+							"    pm.expect(jsonData.birth_date).to.be.a('string');",
+							"    pm.expect(jsonData.document_number).to.be.a('string');",
+							"    pm.expect(jsonData.country).to.be.a('string');",
+							"    pm.expect(jsonData.balance).to.equal(\"0.00\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/client_balance?client_id={{client_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"client_balance"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Perform a debit transaction to negative balance",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains updated balance\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.balance).to.equal(\"-1000.25\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"client_id\": {{client_id}},\n  \"debit_amount\": \"1000.25\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/new_debit_transaction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"new_debit_transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get client balance after negative transaction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains client details with negative balance\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.client_name).to.be.a('string');",
+							"    pm.expect(jsonData.birth_date).to.be.a('string');",
+							"    pm.expect(jsonData.document_number).to.be.a('string');",
+							"    pm.expect(jsonData.country).to.be.a('string');",
+							"    pm.expect(jsonData.balance).to.equal(\"-1000.25\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/client_balance?client_id={{client_id}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"client_balance"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get balance of unexistent client",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Response contains error message\", function () {",
+							"    var responseBody = pm.response.text();",
+							"    pm.expect(responseBody).to.include(\"Client not found\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/client_balance?client_id=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"client_balance"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "client_id",
+			"value": ""
+		},
+		{
+			"key": "document_number",
+			"value": "123456"
+		}
+	]
+}

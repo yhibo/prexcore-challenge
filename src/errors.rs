@@ -4,7 +4,7 @@ use std::fmt;
 pub enum ServiceError {
     ClientAlreadyExists,
     ClientNotFound,
-    InsufficientFunds,
+    InvalidTransactionAmount,
 }
 
 impl fmt::Display for ServiceError {
@@ -12,7 +12,7 @@ impl fmt::Display for ServiceError {
         match self {
             ServiceError::ClientAlreadyExists => write!(f, "Client already exists"),
             ServiceError::ClientNotFound => write!(f, "Client not found"),
-            ServiceError::InsufficientFunds => write!(f, "Insufficient funds"),
+            ServiceError::InvalidTransactionAmount => write!(f, "Invalid transaction amount, it must be positive and with 2 decimal places")
         }
     }
 }

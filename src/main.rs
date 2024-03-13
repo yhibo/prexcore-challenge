@@ -1,5 +1,5 @@
 use actix_web::{web, App, HttpServer};
-use std::sync::Mutex;
+use tokio::sync::Mutex;
 
 mod errors;
 mod handlers;
