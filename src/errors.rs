@@ -5,6 +5,7 @@ pub enum ServiceError {
     ClientAlreadyExists,
     ClientNotFound,
     InvalidTransactionAmount,
+    InsufficientFunds,
 }
 
 // Implement the Display trait for the ServiceError enum to provide user-friendly error messages.
@@ -16,6 +17,10 @@ impl fmt::Display for ServiceError {
             ServiceError::InvalidTransactionAmount => write!(
                 f,
                 "Invalid transaction amount, it must be positive and with 2 decimal places"
+            ),
+            ServiceError::InsufficientFunds => write!(
+                f,
+                "Transaction error: insufficient funds"
             ),
         }
     }

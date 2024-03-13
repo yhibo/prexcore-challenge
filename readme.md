@@ -100,7 +100,7 @@ This will compile the Rust API server and start it. The server runs on `127.0.0.
 
 ## Testing the API
 
-To test the API, you can use the Postman CLI, ensure you have it installed. You can run the Postman collection tests with the following command:
+To test the API, you can use the Postman CLI, ensure you have it installed. Before running the Postman collection tests, make sure to start the server with a clean state. This ensures that any previous data or state doesn't interfere with the tests. You can run the Postman collection tests with the following command:
 
 ```bash
 postman collection run api_test.postman_collection.json

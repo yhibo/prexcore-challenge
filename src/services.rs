@@ -63,7 +63,13 @@ pub fn transaction(
     // Update the client's balance based on the transaction type.
     match transaction_type {
         TransactionType::Credit => client.balance += amount,
-        TransactionType::Debit => client.balance -= amount,
+        TransactionType::Debit => {
+            // Check if the client has sufficient funds.
+            if client.balance < amount {
+                return Err(ServiceError::InsufficientFunds);
+            }
+            client.balance -= amount;
+        }
     }
 
     // Return the updated balance.
@@ -79,10 +85,11 @@ pub fn store_balances(db: &mut ClientDB) -> Result<(), std::io::Error> {
     let filename = format!("{}_{}.DAT", now, db.balance_store_counter);
     db.balance_store_counter += 1;
 
-    // Open or create the file for appending balance data.
+    // Open or create the file.
     let mut file = OpenOptions::new()
         .create(true)
-        .append(true)
+        .write(true)
+        .truncate(true)
         .open(filename)?;
 
     // Determine the width needed to format client IDs uniformly.

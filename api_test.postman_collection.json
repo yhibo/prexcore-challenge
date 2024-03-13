@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "4f331836-e240-4e1c-adf3-65bca2d2e226",
+		"_postman_id": "92ad4cf9-9221-4361-ba8f-d070bbe21c61",
 		"name": "PrexCore Challenge API Testing",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "33499782"
@@ -441,13 +441,13 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
+							"pm.test(\"Status code is 400\", function () {",
+							"    pm.response.to.have.status(400);",
 							"});",
 							"",
-							"pm.test(\"Response contains updated balance\", function () {",
-							"    var jsonData = pm.response.json();",
-							"    pm.expect(jsonData.balance).to.equal(\"-1000.25\");",
+							"pm.test(\"Response contains error message\", function () {",
+							"    var responseBody = pm.response.text();",
+							"    pm.expect(responseBody).to.include(\"Transaction error: insufficient funds\");",
 							"});"
 						],
 						"type": "text/javascript"
@@ -482,7 +482,7 @@
 			"response": []
 		},
 		{
-			"name": "Get client balance after negative transaction",
+			"name": "Get client balance after failed transaction",
 			"event": [
 				{
 					"listen": "test",
@@ -492,13 +492,13 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Response contains client details with negative balance\", function () {",
+							"pm.test(\"Response contains client details with previous balance\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.client_name).to.be.a('string');",
 							"    pm.expect(jsonData.birth_date).to.be.a('string');",
 							"    pm.expect(jsonData.document_number).to.be.a('string');",
 							"    pm.expect(jsonData.country).to.be.a('string');",
-							"    pm.expect(jsonData.balance).to.equal(\"-1000.25\");",
+							"    pm.expect(jsonData.balance).to.equal(\"0.00\");",
 							"});"
 						],
 						"type": "text/javascript"
